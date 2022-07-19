@@ -1,0 +1,350 @@
+[19:09:42] [Info] Loading plugin: sscanf
+[19:09:42] [Info] 
+
+[19:09:42] [Info]  ===============================
+
+[19:09:42] [Info]       sscanf plugin loaded.     
+
+[19:09:42] [Info]          Version:  2.8.3        
+
+[19:09:42] [Info]   (c) 2018 Alex "Y_Less" Cole  
+
+[19:09:42] [Info]  ===============================
+
+[19:09:42] [Info] Loading plugin: streamer
+[19:09:42] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito loaded ***
+
+[19:09:42] [Info] Loading plugin: samp_bcrypt
+[19:09:42] [Info] [SampBcrypt] [info]: Version: 0.3.2
+[19:09:42] [Info] Loading plugin: mysql
+[19:09:42] [Info]  >> plugin.mysql: R41-4 successfully loaded.
+[19:09:42] [Info] Loading plugin: pawn-memory
+[19:09:42] [Info] ========================
+[19:09:42] [Info] = Memory access plugin =
+[19:09:42] [Info] =       Made by BigETI =
+[19:09:42] [Info] = Loaded!              =
+[19:09:42] [Info] ========================
+[19:09:42] [Info] Loading plugin: samp-compat
+[19:09:42] [Info]   -- samp-compat: Unsupported version
+[19:09:42] [Info] Could not find:
+
+	 filterscripts\Mapping.amx 
+While attempting to load a PAWN gamemode, a file-not-found error was
+encountered.  This could be caused by many things:
+                
+ * The wrong filename was given.
+ * The wrong gamemodes path was given.
+ * The server was launched from a different directory, making relative paths
+   relative to the wrong place (and thus wrong).
+ * You didn't copy the file to the correct directory or server.
+ * The compilation failed, leading to no output file.
+ * `-l` or `-a` were used to compile, which output intermediate steps for
+   inspecting, rather than a full script.
+ * Anything else, really just check the file is at the path given.
+			
+[19:10:19] [Info] Loading plugin: sscanf
+[19:10:19] [Info] 
+
+[19:10:19] [Info]  ===============================
+
+[19:10:19] [Info]       sscanf plugin loaded.     
+
+[19:10:19] [Info]          Version:  2.8.3        
+
+[19:10:19] [Info]   (c) 2018 Alex "Y_Less" Cole  
+
+[19:10:19] [Info]  ===============================
+
+[19:10:19] [Info] Loading plugin: streamer
+[19:10:19] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito loaded ***
+
+[19:10:19] [Info] Loading plugin: samp_bcrypt
+[19:10:19] [Info] [SampBcrypt] [info]: Version: 0.3.2
+[19:10:19] [Info] Loading plugin: mysql
+[19:10:19] [Info]  >> plugin.mysql: R41-4 successfully loaded.
+[19:10:19] [Info] Loading plugin: pawn-memory
+[19:10:19] [Info] ========================
+[19:10:19] [Info] = Memory access plugin =
+[19:10:19] [Info] =       Made by BigETI =
+[19:10:19] [Info] = Loaded!              =
+[19:10:19] [Info] ========================
+[19:10:19] [Info] Could not find:
+
+	 filterscripts\Mapping.amx 
+While attempting to load a PAWN gamemode, a file-not-found error was
+encountered.  This could be caused by many things:
+                
+ * The wrong filename was given.
+ * The wrong gamemodes path was given.
+ * The server was launched from a different directory, making relative paths
+   relative to the wrong place (and thus wrong).
+ * You didn't copy the file to the correct directory or server.
+ * The compilation failed, leading to no output file.
+ * `-l` or `-a` were used to compile, which output intermediate steps for
+   inspecting, rather than a full script.
+ * Anything else, really just check the file is at the path given.
+			
+[19:10:19] [Warning] Deprecated function GetVehiclePoolSize used. This function was replaced by MAX_VEHICLES.
+[19:10:19] [Warning] Deprecated functions will be removed in the next open.mp release.
+[19:10:19] [Info]  
+[19:10:19] [Info]  ========================================== 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  |    Generating code, this may take a    | 
+[19:10:19] [Info]  |           little bit of time.          | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  |             Please wait...             | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  ========================================== 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  | Note that this code generation works   | 
+[19:10:19] [Info]  | best with the JIT plugin, which you    | 
+[19:10:19] [Info]  | are not currently using.  Get it here: | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  |        https://git.io/jit-plugin       | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  ========================================== 
+[19:10:19] [Info]  
+[19:10:19] [Info]  
+[19:10:19] [Info]  
+[19:10:19] [Info]  
+[19:10:19] [Info]  ========================================== 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  |         YSI version 5.05.0301          | 
+[19:10:19] [Info]  |         By Alex "Y_Less" Cole          | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  | Unable to check the latest YSI version | 
+[19:10:19] [Info]  | - please watch the forums and github:  | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  |   https://git.io/5.x                   | 
+[19:10:19] [Info]  |                                        | 
+[19:10:19] [Info]  ========================================== 
+[19:10:19] [Info]  
+[19:10:19] [Info] [ADM] Info: Load EVF v3.3.3 for SA:MP 0.3.7 by Abyss Morgan
+[19:10:19] [Info] [MySQL] - Connection Estabilished!
+[19:10:19] [Info] [ Xyronite Gamemode Loaded ]
+[19:10:19] [Info] Legacy Network started on port 7777
+[19:11:26] [Info] [connection] incoming connection: 103.247.22.221:54550 id: 0
+[19:11:26] [Info] [join] ArthurLucineh has joined the server (0:103.247.22.221)
+[19:12:24] [Info] [chat] [Arthur_Lucineh]: p
+[19:15:18] [Warning] Vehicle created with respawn delay 0 which is undefined behaviour that might change in the future.
+[19:15:18] [Warning] Parameter count does not match specifier in `Script_CallAll`. callback: @@Iter_VehicleDo - fmat: iii - count: 2)
+[19:16:08] [Warning] RCON (In-Game): Player #0 (Arthur_Lucineh) failed login.
+[19:29:07] [Info] Rental_Save
+[13:52:45] [Info] Loading plugin: sscanf
+[13:52:45] [Info] 
+
+[13:52:45] [Info]  ===============================
+
+[13:52:45] [Info]       sscanf plugin loaded.     
+
+[13:52:45] [Info]          Version:  2.8.3        
+
+[13:52:45] [Info]   (c) 2018 Alex "Y_Less" Cole  
+
+[13:52:45] [Info]  ===============================
+
+[13:52:45] [Info] Loading plugin: streamer
+[13:52:45] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito loaded ***
+
+[13:52:45] [Info] Loading plugin: samp_bcrypt
+[13:52:45] [Info] [SampBcrypt] [info]: Version: 0.3.2
+[13:52:45] [Info] Loading plugin: mysql
+[13:52:45] [Info]  >> plugin.mysql: R41-4 successfully loaded.
+[13:52:45] [Info] Loading plugin: pawn-memory
+[13:52:45] [Info] ========================
+[13:52:45] [Info] = Memory access plugin =
+[13:52:45] [Info] =       Made by BigETI =
+[13:52:45] [Info] = Loaded!              =
+[13:52:45] [Info] ========================
+[13:52:45] [Info] Could not find:
+
+	 filterscripts\Mapping.amx 
+While attempting to load a PAWN gamemode, a file-not-found error was
+encountered.  This could be caused by many things:
+                
+ * The wrong filename was given.
+ * The wrong gamemodes path was given.
+ * The server was launched from a different directory, making relative paths
+   relative to the wrong place (and thus wrong).
+ * You didn't copy the file to the correct directory or server.
+ * The compilation failed, leading to no output file.
+ * `-l` or `-a` were used to compile, which output intermediate steps for
+   inspecting, rather than a full script.
+ * Anything else, really just check the file is at the path given.
+			
+[13:52:45] [Warning] Deprecated function GetVehiclePoolSize used. This function was replaced by MAX_VEHICLES.
+[13:52:45] [Warning] Deprecated functions will be removed in the next open.mp release.
+[13:52:45] [Info]  
+[13:52:45] [Info]  ========================================== 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  |    Generating code, this may take a    | 
+[13:52:45] [Info]  |           little bit of time.          | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  |             Please wait...             | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  ========================================== 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  | Note that this code generation works   | 
+[13:52:45] [Info]  | best with the JIT plugin, which you    | 
+[13:52:45] [Info]  | are not currently using.  Get it here: | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  |        https://git.io/jit-plugin       | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  ========================================== 
+[13:52:45] [Info]  
+[13:52:45] [Info]  
+[13:52:45] [Info]  
+[13:52:45] [Info]  
+[13:52:45] [Info]  ========================================== 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  |         YSI version 5.05.0301          | 
+[13:52:45] [Info]  |         By Alex "Y_Less" Cole          | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  | Unable to check the latest YSI version | 
+[13:52:45] [Info]  | - please watch the forums and github:  | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  |   https://git.io/5.x                   | 
+[13:52:45] [Info]  |                                        | 
+[13:52:45] [Info]  ========================================== 
+[13:52:45] [Info]  
+[13:52:45] [Info] [ADM] Info: Load EVF v3.3.3 for SA:MP 0.3.7 by Abyss Morgan
+[13:52:45] [Info] [MySQL] - Connection Estabilished!
+[13:52:45] [Info] [ Xyronite Gamemode Loaded ]
+[13:52:45] [Info] Legacy Network started on port 7777
+[13:54:08] [Info] [connection] incoming connection: 103.247.22.221:49414 id: 0
+[13:54:08] [Info] [join] ArthurLucineh has joined the server (0:103.247.22.221)
+[13:54:42] [Info] [chat] [Arthur_Lucineh]: A
+[13:55:29] [Warning] Vehicle created with respawn delay 0 which is undefined behaviour that might change in the future.
+[13:55:29] [Warning] Parameter count does not match specifier in `Script_CallAll`. callback: @@Iter_VehicleDo - fmat: iii - count: 2)
+[13:56:40] [Info] [part] Arthur_Lucineh has left the server (0:1)
+[13:58:30] [Info] [connection] incoming connection: 103.247.22.221:54395 id: 0
+[13:58:30] [Info] [join] ArthurLucineh has joined the server (0:103.247.22.221)
+[13:59:19] [Info] [part] Arthur_Lucineh has left the server (0:1)
+[13:59:51] [Info] [connection] incoming connection: 103.247.22.221:51849 id: 0
+[13:59:51] [Info] [join] ArthurLucineh has joined the server (0:103.247.22.221)
+[14:00:30] [Info] [chat] [Arthur_Hernandez]: a
+[14:00:59] [Info] [part] Arthur_Hernandez has left the server (0:1)
+[14:01:36] [Info] [connection] incoming connection: 103.247.22.221:56917 id: 0
+[14:01:36] [Info] [join] ArthurLucineh has joined the server (0:103.247.22.221)
+[14:06:13] [Warning] Parameter count does not match specifier in `Script_CallAll`. callback: @@Iter_VehicleDo - fmat: iii - count: 2)
+[14:06:22] [Info] [part] Arthur_Hernandez has left the server (0:1)
+[15:37:35] [Info] [ADM] Info: Unload EVF v3.3.3 for SA:MP 0.3.7 by Abyss Morgan
+[15:37:35] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito unloaded ***
+
+[15:37:35] [Info] 
+
+[15:37:35] [Info]  ===============================
+
+[15:37:35] [Info]      sscanf plugin unloaded.    
+
+[15:37:35] [Info]  ===============================
+
+[15:37:35] [Info] plugin.mysql: Unloading plugin...
+[16:58:43] [Info] Loading plugin: sscanf
+[16:58:43] [Info] 
+
+[16:58:43] [Info]  ===============================
+
+[16:58:43] [Info]       sscanf plugin loaded.     
+
+[16:58:43] [Info]          Version:  2.8.3        
+
+[16:58:43] [Info]   (c) 2018 Alex "Y_Less" Cole  
+
+[16:58:43] [Info]  ===============================
+
+[16:58:43] [Info] Loading plugin: streamer
+[16:58:43] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito loaded ***
+
+[16:58:43] [Info] Loading plugin: samp_bcrypt
+[16:58:43] [Info] [SampBcrypt] [info]: Version: 0.3.2
+[16:58:43] [Info] Loading plugin: mysql
+[16:58:43] [Info]  >> plugin.mysql: R41-4 successfully loaded.
+[16:58:43] [Info] Loading plugin: pawn-memory
+[16:58:43] [Info] ========================
+[16:58:43] [Info] = Memory access plugin =
+[16:58:43] [Info] =       Made by BigETI =
+[16:58:43] [Info] = Loaded!              =
+[16:58:43] [Info] ========================
+[16:58:43] [Info] Could not find:
+
+	 filterscripts\Mapping.amx 
+While attempting to load a PAWN gamemode, a file-not-found error was
+encountered.  This could be caused by many things:
+                
+ * The wrong filename was given.
+ * The wrong gamemodes path was given.
+ * The server was launched from a different directory, making relative paths
+   relative to the wrong place (and thus wrong).
+ * You didn't copy the file to the correct directory or server.
+ * The compilation failed, leading to no output file.
+ * `-l` or `-a` were used to compile, which output intermediate steps for
+   inspecting, rather than a full script.
+ * Anything else, really just check the file is at the path given.
+			
+[16:58:44] [Warning] Deprecated function GetVehiclePoolSize used. This function was replaced by MAX_VEHICLES.
+[16:58:44] [Warning] Deprecated functions will be removed in the next open.mp release.
+[16:58:44] [Info]  
+[16:58:44] [Info]  ========================================== 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  |    Generating code, this may take a    | 
+[16:58:44] [Info]  |           little bit of time.          | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  |             Please wait...             | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  ========================================== 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  | Note that this code generation works   | 
+[16:58:44] [Info]  | best with the JIT plugin, which you    | 
+[16:58:44] [Info]  | are not currently using.  Get it here: | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  |        https://git.io/jit-plugin       | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  ========================================== 
+[16:58:44] [Info]  
+[16:58:44] [Info]  
+[16:58:44] [Info]  
+[16:58:44] [Info]  
+[16:58:44] [Info]  ========================================== 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  |         YSI version 5.05.0301          | 
+[16:58:44] [Info]  |         By Alex "Y_Less" Cole          | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  | Unable to check the latest YSI version | 
+[16:58:44] [Info]  | - please watch the forums and github:  | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  |   https://git.io/5.x                   | 
+[16:58:44] [Info]  |                                        | 
+[16:58:44] [Info]  ========================================== 
+[16:58:44] [Info]  
+[16:58:44] [Info] [ADM] Info: Load EVF v3.3.3 for SA:MP 0.3.7 by Abyss Morgan
+[16:58:44] [Info] [MySQL] - Connection Estabilished!
+[16:58:44] [Info] [ Xyronite Gamemode Loaded ]
+[16:58:44] [Info] Legacy Network started on port 7777
+[16:58:50] [Info] [connection] incoming connection: 103.247.22.221:59980 id: 0
+[16:58:50] [Info] [join] Arthur_Lucineh has joined the server (0:103.247.22.221)
+[16:58:58] [Info] [part] Arthur_Lucineh has left the server (0:2)
+[17:01:13] [Info] [ADM] Info: Unload EVF v3.3.3 for SA:MP 0.3.7 by Abyss Morgan
+[17:01:13] [Info] 
+
+*** Streamer Plugin v2.9.4 by Incognito unloaded ***
+
+[17:01:13] [Info] 
+
+[17:01:13] [Info]  ===============================
+
+[17:01:13] [Info]      sscanf plugin unloaded.    
+
+[17:01:13] [Info]  ===============================
+
+[17:01:13] [Info] plugin.mysql: Unloading plugin...
