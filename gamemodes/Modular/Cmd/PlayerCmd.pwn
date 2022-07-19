@@ -19,3 +19,12 @@ CMD:rentinfo(playerid, params[])
 		SendErrorMessage(playerid, "Kamu tidak memiliki kendaraan Rental!");
 	return 1;
 }
+
+CMD:help(playerid, params[])
+{
+	if(!PlayerData[playerid][pSpawned])
+		return SendErrorMessage(playerid, "You're not spawned!");
+
+	ShowPlayerDialog(playerid, DIALOG_HELP, DIALOG_STYLE_LIST, "Help Menu", "General Commands\nChat Commands\nJob Commands\nFaction Commands\nBusiness Commands\nHouse Commands\nBank Commands\nDealership Commands\nWorkshop Commands\nPrivate Farm Commands", "Select", "Close");
+	return 1;
+}

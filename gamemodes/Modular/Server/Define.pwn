@@ -41,3 +41,4 @@
 #define MAX_BUSINESS                100
 #define MAX_DROPPED_ITEMS  			1000
 #define MAX_RENTAL                  20
+#define MAX_FACTIONS				10

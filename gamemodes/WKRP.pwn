@@ -149,6 +149,103 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
+	if(dialogid == DIALOG_HELP)
+	{
+		new string[1412];
+		if(response)
+		{
+			if(listitem == 0)
+			{
+				strcat(string, "/phone | /salary | /insu | /weapon | /takejob | /quitjob | /renthelp | /call | /accept | /animlist\n");
+				strcat(string, "/pay | /buy | /refuel | /inventory | /enter | /jobdelay | /report | /ask | /sms | /myproperty \n");
+				strcat(string, "/health [opt:playerid/name] | /mask | /atm | /stats | /drag | /undrag | /frisk | /factions\n");
+				strcat(string, "/tempdamage [opt:playerid/PartOfName] | /setfreq | /pr | /disablecp | /licenses [opt:playerid/PartOfName]\n");
+				strcat(string, "/v(ehicle) | /seatbelt | /isafk | /clearchat | /fish | /sellfish | /myfish | /buybait | /toggle\n");
+				strcat(string, "/tag | /cursor | /hidebuy | /tog(gle) | /warnings | /hbestyle | /weapon | /weapon | /usecigar | /usecrack | /useweed\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "General Commands", string, "Back", "");
+			}
+			if(listitem == 1)
+			{
+				strcat(string, "/me | /ame | /pr | /do | /l(ow) | /w(hisper) | /o | /c | /pm");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Chat Commands", string, "Back", "");
+			}
+			if(listitem == 2)
+			{
+				ShowPlayerDialog(playerid, DIALOG_HELP_JOB, DIALOG_STYLE_LIST, "Job Commands", "Trucker\nMechanic\nTaxi\nLumberjack\nFarmer\nMiner\nSidejob: Trashmaster", "Select", "Close");
+			}
+			if(listitem == 3)
+			{
+				strcat(string, "/faction [invite/kick/menu/accept/locker/setrank/quit]\n");
+				strcat(string, "/r | /or | /d | /od\n");
+				if(GetFactionType(playerid) == FACTION_POLICE)
+				{
+					strcat(string, "/mdc | /arrest | /detain | /cuff | /uncuff | /impound | /seizeweed | /m(egaphone)\n");
+					strcat(string, "/take | /callsign | /spike | /tazer | /backup | /flare | /deploy | /undeploy | /undeployall\n");
+				}
+				else if(GetFactionType(playerid) == FACTION_MEDIC)
+				{
+					strcat(string, "/mdc | /treatment | /m(egaphone) | /stretcher");
+				}
+				else if(GetFactionType(playerid) == FACTION_NEWS)
+				{
+					strcat(string, "/live | /guest [invite/remove]");
+				}
+				else if(GetFactionType(playerid) == FACTION_GOV)
+				{
+					strcat(string, "/tax [set/withdraw/deposit]");
+				}
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Faction Commands", string, "Back", "");
+			}
+			if(listitem == 4)
+			{
+				strcat(string, "/biz buy - untuk membeli Business\n");
+				strcat(string, "/biz menu - untuk membuka menu Business (for owner)\n");
+				strcat(string, "/biz lock - untuk toggle lock/unlock Business\n");
+				strcat(string, "/biz reqstock - untuk meminta restock kepada Trucker\n");
+				strcat(string, "/biz convertfuel - untuk merestock Fuel stock (24/7 only)\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Business Commands", string, "Back", "");
+
+			}
+			if(listitem == 5)
+			{
+				strcat(string, "/house buy - untuk membeli house\n");
+				strcat(string, "/house lock - untuk toggle lock/unlock House\n");
+				strcat(string, "/house menu - untuk membuka House Menu\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "House Commands", string, "Back", "");
+			}
+			if(listitem == 6)
+			{
+				strcat(string, "/withdraw - untuk menarik uang dari Bank\n");
+				strcat(string, "/deposit - untuk menyimpan uang ke Bank\n");
+				strcat(string, "/paycheck - untuk mencairkan salary\n");
+				strcat(string, "/balance - untuk melihat total uang di Bank\n");
+				strcat(string, "/transfer - untuk men-transfer uang ke player lain\n");
+				strcat(string, "/robbank - untuk merampok bank\n");
+				strcat(string, "/setupvault - untuk memasang bom di brangkas bank\n");
+				strcat(string, "\nNote: Command diatas hanya bisa dilakukan di Bank Point.");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Bank Commands", string, "Back", "");
+			}
+			if(listitem == 7)
+			{
+				strcat(string, "/dealer buy - untuk membeli dealership\n");
+				strcat(string, "/dealer buyvehicle - untuk membeli kendaraan\n");
+				strcat(string, "/dealer menu - untuk membuka Dealership menu\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Dealership Commands", string, "Back", "");
+			}
+			if(listitem == 8)
+			{
+				strcat(string, "/workshop buy - untuk membeli Workshop\n");
+				strcat(string, "/workshop menu - untuk membuka Workshop menu\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Workshop Commands", string, "Back", "");
+			}
+			if(listitem == 9)
+			{
+				strcat(string, "/farm buy - untuk membeli Farm\n");
+				strcat(string, "/farm menu - untuk membuka Farm menu\n");
+				ShowPlayerDialog(playerid, DIALOG_HELP_RETURN, DIALOG_STYLE_MSGBOX, "Farm Commands", string, "Back", "");
+			}
+		}
+	}
 	if(dialogid == DIALOG_BIZPRICE)
 	{
 	    if(response)
