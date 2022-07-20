@@ -8,4 +8,7 @@
 [x] Player Vehicle system\
 [x] Vehicle insurance system (unfinished yet)\
 [x] Dynamic player inventory system
+[x] Dynamic House system 
+[x] Funiture System
+[x] Parking House system with slot vehicle (unfinished yed)
 
