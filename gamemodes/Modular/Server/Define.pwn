@@ -42,3 +42,7 @@
 #define MAX_DROPPED_ITEMS  			1000
 #define MAX_RENTAL                  20
 #define MAX_FACTIONS				10
+#define MAX_HOUSES					1000
+#define MAX_FURNITURE				2000
+#define MAX_HOUSE_FURNITURE			30
+#define MAX_HOUSE_STORAGE			10
