@@ -10,7 +10,8 @@
 			   - SyS (For the samp-bcrypt)
 			   - Southclaws (For the progress2)
 			   - Incognito (For the streamer)
-			   - LuminouZ (For the main Gamemode Scripter)
+			   - LuminouZ (For the base Gamemode Scripter)
+			   - WisnuYundo (For the main Gamemode Scripter)
 			   
     > NOTE: Please don't remove the credits!
     
