@@ -65,15 +65,20 @@ enum
 	DIALOG_BUYSKINS,
 	DIALOG_INSURANCE,
 	DIALOG_BUYINSURANCE,
+	//Rental
 	DIALOG_RENTAL,
 	DIALOG_RENTTIME,
+	//Biz
 	DIALOG_BIZMENU,
 	DIALOG_BIZNAME,
 	DIALOG_BIZPROD,
 	DIALOG_BIZPRODSET,
 	DIALOG_BIZPRICE,
 	DIALOG_BIZPRICESET,
-	DIALOG_BIZCARGO
+	DIALOG_BIZCARGO,
+	//House
+	DIALOG_HOUSE_MENU,
+	DIALOG_HOUSE_PARK
 };
 
 enum e_player_data
@@ -84,6 +89,7 @@ enum e_player_data
 	Float:pPos[3],
 	pWorld,
 	pInterior,
+	pInHouse,
 	pSkin,
 	pAge,
 	pAttempt,

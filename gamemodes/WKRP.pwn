@@ -37,6 +37,7 @@
 #include <sscanf2>
 #include <streamer>
 #include <PreviewModelDialog2>
+#include <strlib>
 
 //==========[ MODULAR ]==========
 //==[ Server Define And Variable ]==
@@ -46,6 +47,7 @@
 //==[ Dynamic ]==
 #include "Modular\Dynamic\Bisnis.pwn"
 #include "Modular\Dynamic\Rental.pwn"
+#include "Modular\Dynamic\House.pwn"
 
 //==[ Player ]==
 #include "Modular\Player\Inventory.pwn"
