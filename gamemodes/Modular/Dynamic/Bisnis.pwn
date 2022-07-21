@@ -486,51 +486,7 @@ CMD:biz(playerid, params[])
 	return 1;
 }
 
-CMD:inventory(playerid, params[])
-{
-	PlayerData[playerid][pStorageSelect] = 0;
-	OpenInventory(playerid);
-	return 1;
-}
 
-CMD:makemeadmin(playerid, params[])
-{
-	PlayerData[playerid][pAdmin] = 7;
-	return 1;
-}
-CMD:enter(playerid, params[])
-{
-	if(!IsPlayerInAnyVehicle(playerid))
-	{
-		forex(bid, MAX_BUSINESS) if(BizData[bid][bizExists])
-		{
-			if(IsPlayerInRangeOfPoint(playerid, 2.8, BizData[bid][bizExt][0], BizData[bid][bizExt][1], BizData[bid][bizExt][2]))
-			{
-				if(BizData[bid][bizLocked])
-					return SendErrorMessage(playerid, "This business is Locked by the Owner!");
-
-				PlayerData[playerid][pInBiz] = bid;
-				SetPlayerPosEx(playerid, BizData[bid][bizInt][0], BizData[bid][bizInt][1], BizData[bid][bizInt][2]);
-
-				SetPlayerInterior(playerid, BizData[bid][bizInterior]);
-				SetPlayerVirtualWorld(playerid, BizData[bid][bizWorld]);
-				SetCameraBehindPlayer(playerid);
-				SetPlayerWeather(playerid, 0);
-			}
-	    }
-		new inbiz = PlayerData[playerid][pInBiz];
-		if(PlayerData[playerid][pInBiz] != -1 && IsPlayerInRangeOfPoint(playerid, 2.8, BizData[inbiz][bizInt][0], BizData[inbiz][bizInt][1], BizData[inbiz][bizInt][2]))
-		{
-			SetPlayerPos(playerid, BizData[inbiz][bizExt][0], BizData[inbiz][bizExt][1], BizData[inbiz][bizExt][2]);
-
-			PlayerData[playerid][pInBiz] = -1;
-			SetPlayerInterior(playerid, 0);
-			SetPlayerVirtualWorld(playerid, 0);
-			SetCameraBehindPlayer(playerid);
-		}
-	}
-	return 1;
-}
 
 CMD:buy(playerid, params[])
 {

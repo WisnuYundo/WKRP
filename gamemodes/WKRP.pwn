@@ -27,6 +27,7 @@
 /* Includes */
 #include <a_samp>
 #include <a_mysql>
+#include <eSelection>
 #include <YSI_Coding\y_va>
 #include <YSI_Coding\y_timers>
 #include <foreach>
@@ -38,6 +39,7 @@
 #include <streamer>
 #include <PreviewModelDialog2>
 #include <strlib>
+
 
 //==========[ MODULAR ]==========
 //==[ Server Define And Variable ]==
@@ -64,7 +66,10 @@
 #include "Modular\Cmd\AdminCmd.pwn"
 
 //==[ Server Function ]==
+#include "Modular\Server\Streamer.pwn"
+#include "Modular\Server\Textdraw.pwn"
 #include "Modular\Server\Function.pwn" //Ini ditaruh di bawah karena ada variable yang tidak ke include
+
 /* Gamemode Start! */
 
 main()
@@ -80,10 +85,14 @@ public OnGameModeInit()
 	EnableStuntBonusForAll(0);
 	ManualVehicleEngineAndLights();
 	StreamerConfig();
+	Iter_Init(House);
+	Iter_Init(FurnitureHouse);
+	Iter_Init(PlayerVehicle);
 	/* Load from Database */
 	mysql_tquery(sqlcon, "SELECT * FROM `business`", "Business_Load");
 	mysql_tquery(sqlcon, "SELECT * FROM `dropped`", "Dropped_Load", "");
 	mysql_tquery(sqlcon, "SELECT * FROM `rental`", "Rental_Load", "");
+	mysql_tquery(sqlcon, "SELECT * FROM `houses`", "House_Load", "");
 	return 1;
 }
 
@@ -150,8 +159,169 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	return 1;
 }
 
+public OnModelSelectionResponse(playerid, extraid, index, modelid, response)
+{
+	if ((response) && (extraid == MODEL_SELECTION_FURNITURE))
+	{
+        new
+			id = House_Inside(playerid),
+			price;
+
+		new
+		    Float:x,
+		    Float:y,
+		    Float:z,
+		    Float:angle;
+
+        GetPlayerPos(playerid, x, y, z);
+        GetPlayerFacingAngle(playerid, angle);
+
+        x += 5.0 * floatsin(-angle, degrees);
+        y += 5.0 * floatcos(-angle, degrees);
+
+	    if (id != -1)
+	    {
+	        price = Furniture_ReturnPrice(PlayerData[playerid][pListitem]);
+
+	        if (GetMoney(playerid) < price)
+	            return SendErrorMessage(playerid, "You have insufficient funds for the purchase.");
+
+			new furniture = Furniture_Add(House_Inside(playerid), GetFurnitureNameByModel(modelid), modelid, x, y, z, 0.0, 0.0, angle);
+
+			if(furniture == INVALID_ITERATOR_SLOT)
+				return SendErrorMessage(playerid, "The server cannot create more furniture's!");
+
+			GiveMoney(playerid, -price);
+			SendServerMessage(playerid, "You have purchased a \"%s\" for %s.", GetFurnitureNameByModel(modelid), FormatNumber(price));
+			Streamer_Update(playerid, STREAMER_TYPE_OBJECT);
+	    }
+	}
+	return 1;
+}
+
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
+	//Dialog Server
+	if(dialogid == DIALOG_REGISTER)
+	{
+	    if(!response)
+	        return Kick(playerid);
+
+		new str[256];
+	    format(str, sizeof(str), "{FFFFFF}UCP Account: {00FFFF}%s\n{FFFFFF}Attempts: {00FFFF}%d/5\n{FFFFFF}Create Password: {FF00FF}(Input Below)", GetName(playerid), PlayerData[playerid][pAttempt]);
+
+        if(strlen(inputtext) < 7)
+			return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register to Xyronite", str, "Register", "Exit");
+
+        if(strlen(inputtext) > 32)
+			return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register to Xyronite", str, "Register", "Exit");
+
+        bcrypt_hash(playerid, "HashPlayerPassword", inputtext, BCRYPT_COST);
+	}
+	if(dialogid == DIALOG_LOGIN)
+	{
+	    if(!response)
+	        return Kick(playerid);
+	        
+        if(strlen(inputtext) < 1)
+        {
+			new str[256];
+            format(str, sizeof(str), "{FFFFFF}UCP Account: {00FFFF}%s\n{FFFFFF}Attempts: {00FFFF}%d/5\n{FFFFFF}Password: {FF00FF}(Input Below)", GetName(playerid), PlayerData[playerid][pAttempt]);
+            ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login to Xyronite", str, "Login", "Exit");
+            return 1;
+		}
+		new pwQuery[256], hash[BCRYPT_HASH_LENGTH];
+		mysql_format(sqlcon, pwQuery, sizeof(pwQuery), "SELECT Password FROM PlayerUCP WHERE UCP = '%e' LIMIT 1", GetName(playerid));
+		mysql_query(sqlcon, pwQuery);
+		
+        cache_get_value_name(0, "Password", hash, sizeof(hash));
+        
+        bcrypt_verify(playerid, "OnPlayerPasswordChecked", inputtext, hash);
+
+	}
+    if(dialogid == DIALOG_CHARLIST)
+    {
+		if(response)
+		{
+			if (PlayerChar[playerid][listitem][0] == EOS)
+				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Exit");
+
+			PlayerData[playerid][pChar] = listitem;
+			SetPlayerName(playerid, PlayerChar[playerid][listitem]);
+
+			new cQuery[256];
+			mysql_format(sqlcon, cQuery, sizeof(cQuery), "SELECT * FROM `characters` WHERE `Name` = '%s' LIMIT 1;", PlayerChar[playerid][PlayerData[playerid][pChar]]);
+			mysql_tquery(sqlcon, cQuery, "LoadCharacterData", "d", playerid);
+			
+		}
+	}
+	if(dialogid == DIALOG_MAKECHAR)
+	{
+	    if(response)
+	    {
+		    if(strlen(inputtext) < 1 || strlen(inputtext) > 24)
+				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Back");
+
+			if(!IsRoleplayName(inputtext))
+				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Back");
+
+			new characterQuery[178];
+			mysql_format(sqlcon, characterQuery, sizeof(characterQuery), "SELECT * FROM `characters` WHERE `Name` = '%s'", inputtext);
+			mysql_tquery(sqlcon, characterQuery, "InsertPlayerName", "ds", playerid, inputtext);
+
+		    format(PlayerData[playerid][pUCP], 22, GetName(playerid));
+		}
+	}
+	if(dialogid == DIALOG_AGE)
+	{
+		if(response)
+		{
+			if(strval(inputtext) >= 70)
+			    return ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "ERROR: Cannot more than 70 years old!", "Continue", "Cancel");
+
+			if(strval(inputtext) < 13)
+			    return ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "ERROR: Cannot below 13 Years Old!", "Continue", "Cancel");
+
+			PlayerData[playerid][pAge] = strval(inputtext);
+			ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
+		}
+		else
+		{
+		    ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "Please Insert your Character Age", "Continue", "Cancel");
+		}
+	}
+	if(dialogid == DIALOG_ORIGIN)
+	{
+	    if(!response)
+	        return ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
+
+		if(strlen(inputtext) < 1)
+		    return ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
+
+        format(PlayerData[playerid][pOrigin], 32, inputtext);
+        ShowPlayerDialog(playerid, DIALOG_GENDER, DIALOG_STYLE_LIST, "Character Gender", "Male\nFemale", "Continue", "Cancel");
+	}
+	if(dialogid == DIALOG_GENDER)
+	{
+	    if(!response)
+	        return ShowPlayerDialog(playerid, DIALOG_GENDER, DIALOG_STYLE_LIST, "Character Gender", "Male\nFemale", "Continue", "Cancel");
+
+		if(listitem == 0)
+		{
+			PlayerData[playerid][pGender] = 1;
+			PlayerData[playerid][pSkin] = 240;
+			PlayerData[playerid][pHealth] = 100.0;
+			SetupPlayerData(playerid);
+		}
+		if(listitem == 1)
+		{
+			PlayerData[playerid][pGender] = 2;
+			PlayerData[playerid][pSkin] = 172;
+			PlayerData[playerid][pHealth] = 100.0;
+			SetupPlayerData(playerid);
+			
+		}
+	}
 	if(dialogid == DIALOG_HELP)
 	{
 		new string[1412];
@@ -249,6 +419,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
+	if(dialogid == DIALOG_STREAMER_CONFIG)
+	{
+		if(response)
+		{
+			new config[] = {1000, 700, 500, 300};
+			new const confignames[][24] = {"High", "Medium", "Low", "Potato"};
+
+			Streamer_SetVisibleItems(STREAMER_TYPE_OBJECT, config[listitem], playerid);
+			SendServerMessage(playerid, "You have adjusted maximum streamed object configuration to {FFFF00}%s", confignames[listitem]);
+			Streamer_Update(playerid, STREAMER_TYPE_OBJECT);
+
+		}
+	}
+	//Biz
 	if(dialogid == DIALOG_BIZPRICE)
 	{
 	    if(response)
@@ -323,6 +507,170 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
+	if(dialogid == DIALOG_BIZBUY)
+	{
+	    if(response)
+	    {
+	        new bid = PlayerData[playerid][pInBiz], price, prodname[34];
+	        if(bid != -1)
+	        {
+	            price = BizData[bid][bizProduct][listitem];
+				prodname = ProductName[bid][listitem];
+	            if(GetMoney(playerid) < price)
+	                return SendErrorMessage(playerid, "You don't have enough money!");
+	                
+				if(BizData[bid][bizStock] < 1)
+					return SendErrorMessage(playerid, "This business is out of stock.");
+					
+				switch(BizData[bid][bizType])
+				{
+				    case 1:
+				    {
+						if(listitem == 0)
+						{
+						    if(GetEnergy(playerid) >= 100)
+						        return SendErrorMessage(playerid, "Your energy is already full!");
+
+							PlayerData[playerid][pEnergy] += 20;
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 1)
+						{
+						    if(GetEnergy(playerid) >= 100)
+						        return SendErrorMessage(playerid, "Your energy is already full!");
+
+							PlayerData[playerid][pEnergy] += 40;
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 2)
+						{
+						    if(GetEnergy(playerid) >= 100)
+						        return SendErrorMessage(playerid, "Your energy is already full!");
+
+							PlayerData[playerid][pEnergy] += 15;
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+					}
+					case 2:
+					{
+					    if(listitem == 0)
+					    {
+							Inventory_Add(playerid, "Snack", 2768, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 1)
+						{
+							Inventory_Add(playerid, "Water", 2958, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 2)
+						{
+							Inventory_Add(playerid, "Mask", 19036, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 3)
+						{
+							Inventory_Add(playerid, "Medkit", 1580, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+					}
+					case 3:
+					{
+					    new gstr[1012];
+					    if(PlayerData[playerid][pGender] == 1)
+					    {
+					        forex(i, sizeof(g_aMaleSkins))
+					        {
+					            format(gstr, sizeof(gstr), "%s%i\n", gstr, g_aMaleSkins[i]);
+							}
+							ShowPlayerDialog(playerid, DIALOG_BUYSKINS, DIALOG_STYLE_PREVIEW_MODEL, "Purchase Clothes", gstr, "Select", "Close");
+						}
+						else
+						{
+					        forex(i, sizeof(g_aFemaleSkins))
+					        {
+					            format(gstr, sizeof(gstr), "%s%i\n", gstr, g_aFemaleSkins[i]);
+							}
+							ShowPlayerDialog(playerid, DIALOG_BUYSKINS, DIALOG_STYLE_PREVIEW_MODEL, "Purchase Clothes", gstr, "Select", "Close");
+						}
+					}
+					case 4:
+					{
+					    if(listitem == 0)
+						{
+						    if(PlayerHasItem(playerid, "Cellphone"))
+						        return SendErrorMessage(playerid, "Kamu sudah memiliki Cellphone!");
+						        
+							PlayerData[playerid][pPhoneNumber] = PlayerData[playerid][pID]+RandomEx(13158, 98942);
+							Inventory_Add(playerid, "Cellphone", 18867, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+					    if(listitem == 1)
+						{
+						    if(PlayerHasItem(playerid, "GPS"))
+						        return SendErrorMessage(playerid, "Kamu sudah memiliki GPS!");
+
+							Inventory_Add(playerid, "GPS", 18875, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+					    if(listitem == 2)
+						{
+						    if(PlayerHasItem(playerid, "Portable Radio"))
+						        return SendErrorMessage(playerid, "Kamu sudah memiliki Portable Radio!");
+
+							Inventory_Add(playerid, "Portable Radio", 19942, 1);
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+						if(listitem == 3)
+						{
+							PlayerData[playerid][pCredit] += 50;
+							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
+							GiveMoney(playerid, -price);
+							BizData[bid][bizStock]--;
+						}
+					}
+				}
+			}
+		}
+	}
+	if(dialogid == DIALOG_BUYSKINS)
+	{
+	    if(response)
+	    {
+	        GiveMoney(playerid, -PlayerData[playerid][pSkinPrice]);
+			SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(PlayerData[playerid][pSkinPrice]), ProductName[PlayerData[playerid][pInBiz]][0]);
+			BizData[PlayerData[playerid][pInBiz]][bizStock]--;
+			if(PlayerData[playerid][pGender] == 1)
+			{
+				UpdatePlayerSkin(playerid, g_aMaleSkins[listitem]);
+			}
+			else
+			{
+				UpdatePlayerSkin(playerid, g_aFemaleSkins[listitem]);
+			}
+		}
+	}
+	//Rental
 	if(dialogid == DIALOG_RENTAL)
 	{
 	    if(response)
@@ -356,23 +704,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             VehicleRental_Create(PlayerData[playerid][pID], RentData[id][rentModel][slot], RentData[id][rentSpawn][0], RentData[id][rentSpawn][1], RentData[id][rentSpawn][2], RentData[id][rentSpawn][3], time*3600, PlayerData[playerid][pRenting]);
 		}
 	}
-	if(dialogid == DIALOG_BUYSKINS)
-	{
-	    if(response)
-	    {
-	        GiveMoney(playerid, -PlayerData[playerid][pSkinPrice]);
-			SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(PlayerData[playerid][pSkinPrice]), ProductName[PlayerData[playerid][pInBiz]][0]);
-			BizData[PlayerData[playerid][pInBiz]][bizStock]--;
-			if(PlayerData[playerid][pGender] == 1)
-			{
-				UpdatePlayerSkin(playerid, g_aMaleSkins[listitem]);
-			}
-			else
-			{
-				UpdatePlayerSkin(playerid, g_aFemaleSkins[listitem]);
-			}
-		}
-	}
+	//Dialog Inventory
 	if(dialogid == DIALOG_DROPITEM)
 	{
 	    if(response)
@@ -549,270 +881,136 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
-	if(dialogid == DIALOG_BIZBUY)
+	//House And Furniture Dialog
+	if(dialogid == DIALOG_FURNITURE_BUY)
 	{
-	    if(response)
-	    {
-	        new bid = PlayerData[playerid][pInBiz], price, prodname[34];
-	        if(bid != -1)
-	        {
-	            price = BizData[bid][bizProduct][listitem];
-				prodname = ProductName[bid][listitem];
-	            if(GetMoney(playerid) < price)
-	                return SendErrorMessage(playerid, "You don't have enough money!");
-	                
-				if(BizData[bid][bizStock] < 1)
-					return SendErrorMessage(playerid, "This business is out of stock.");
-					
-				switch(BizData[bid][bizType])
-				{
-				    case 1:
-				    {
-						if(listitem == 0)
-						{
-						    if(GetEnergy(playerid) >= 100)
-						        return SendErrorMessage(playerid, "Your energy is already full!");
+		if(response)
+		{
+		    new
+				items[50] = {-1, ...},
+				count;
 
-							PlayerData[playerid][pEnergy] += 20;
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 1)
-						{
-						    if(GetEnergy(playerid) >= 100)
-						        return SendErrorMessage(playerid, "Your energy is already full!");
+		    for (new i = 0; i < sizeof(g_aFurnitureData); i ++) if (g_aFurnitureData[i][e_FurnitureType] == listitem + 1) {
+				items[count++] = g_aFurnitureData[i][e_FurnitureModel];
+		    }
+		    PlayerData[playerid][pListitem] = listitem;
 
-							PlayerData[playerid][pEnergy] += 40;
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 2)
-						{
-						    if(GetEnergy(playerid) >= 100)
-						        return SendErrorMessage(playerid, "Your energy is already full!");
-
-							PlayerData[playerid][pEnergy] += 15;
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-					}
-					case 2:
-					{
-					    if(listitem == 0)
-					    {
-							Inventory_Add(playerid, "Snack", 2768, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 1)
-						{
-							Inventory_Add(playerid, "Water", 2958, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 2)
-						{
-							Inventory_Add(playerid, "Mask", 19036, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 3)
-						{
-							Inventory_Add(playerid, "Medkit", 1580, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-					}
-					case 3:
-					{
-					    new gstr[1012];
-					    if(PlayerData[playerid][pGender] == 1)
-					    {
-					        forex(i, sizeof(g_aMaleSkins))
-					        {
-					            format(gstr, sizeof(gstr), "%s%i\n", gstr, g_aMaleSkins[i]);
-							}
-							ShowPlayerDialog(playerid, DIALOG_BUYSKINS, DIALOG_STYLE_PREVIEW_MODEL, "Purchase Clothes", gstr, "Select", "Close");
-						}
-						else
-						{
-					        forex(i, sizeof(g_aFemaleSkins))
-					        {
-					            format(gstr, sizeof(gstr), "%s%i\n", gstr, g_aFemaleSkins[i]);
-							}
-							ShowPlayerDialog(playerid, DIALOG_BUYSKINS, DIALOG_STYLE_PREVIEW_MODEL, "Purchase Clothes", gstr, "Select", "Close");
-						}
-					}
-					case 4:
-					{
-					    if(listitem == 0)
-						{
-						    if(PlayerHasItem(playerid, "Cellphone"))
-						        return SendErrorMessage(playerid, "Kamu sudah memiliki Cellphone!");
-						        
-							PlayerData[playerid][pPhoneNumber] = PlayerData[playerid][pID]+RandomEx(13158, 98942);
-							Inventory_Add(playerid, "Cellphone", 18867, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-					    if(listitem == 1)
-						{
-						    if(PlayerHasItem(playerid, "GPS"))
-						        return SendErrorMessage(playerid, "Kamu sudah memiliki GPS!");
-
-							Inventory_Add(playerid, "GPS", 18875, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-					    if(listitem == 2)
-						{
-						    if(PlayerHasItem(playerid, "Portable Radio"))
-						        return SendErrorMessage(playerid, "Kamu sudah memiliki Portable Radio!");
-
-							Inventory_Add(playerid, "Portable Radio", 19942, 1);
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-						if(listitem == 3)
-						{
-							PlayerData[playerid][pCredit] += 50;
-							SendNearbyMessage(playerid, 20.0, COLOR_PURPLE, "* %s has paid %s and purchased a %s.", ReturnName(playerid), FormatNumber(price), prodname);
-							GiveMoney(playerid, -price);
-							BizData[bid][bizStock]--;
-						}
-					}
-				}
+			if (listitem == 3) {
+				ShowModelSelectionMenu(playerid, "Furniture", MODEL_SELECTION_FURNITURE, items, count, -12.0, 0.0, 0.0);
+			}
+			else {
+			    ShowModelSelectionMenu(playerid, "Furniture", MODEL_SELECTION_FURNITURE, items, count);
 			}
 		}
 	}
-	if(dialogid == DIALOG_REGISTER)
+	if(dialogid == DIALOG_FURNITURE_MENU)
 	{
-	    if(!response)
-	        return Kick(playerid);
+		new id = PlayerData[playerid][pEditing];
 
-		new str[256];
-	    format(str, sizeof(str), "{FFFFFF}UCP Account: {00FFFF}%s\n{FFFFFF}Attempts: {00FFFF}%d/5\n{FFFFFF}Create Password: {FF00FF}(Input Below)", GetName(playerid), PlayerData[playerid][pAttempt]);
-
-        if(strlen(inputtext) < 7)
-			return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register to Xyronite", str, "Register", "Exit");
-
-        if(strlen(inputtext) > 32)
-			return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Register to Xyronite", str, "Register", "Exit");
-
-        bcrypt_hash(playerid, "HashPlayerPassword", inputtext, BCRYPT_COST);
-	}
-	if(dialogid == DIALOG_LOGIN)
-	{
-	    if(!response)
-	        return Kick(playerid);
-	        
-        if(strlen(inputtext) < 1)
-        {
-			new str[256];
-            format(str, sizeof(str), "{FFFFFF}UCP Account: {00FFFF}%s\n{FFFFFF}Attempts: {00FFFF}%d/5\n{FFFFFF}Password: {FF00FF}(Input Below)", GetName(playerid), PlayerData[playerid][pAttempt]);
-            ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login to Xyronite", str, "Login", "Exit");
-            return 1;
-		}
-		new pwQuery[256], hash[BCRYPT_HASH_LENGTH];
-		mysql_format(sqlcon, pwQuery, sizeof(pwQuery), "SELECT Password FROM PlayerUCP WHERE UCP = '%e' LIMIT 1", GetName(playerid));
-		mysql_query(sqlcon, pwQuery);
-		
-        cache_get_value_name(0, "Password", hash, sizeof(hash));
-        
-        bcrypt_verify(playerid, "OnPlayerPasswordChecked", inputtext, hash);
-
-	}
-    if(dialogid == DIALOG_CHARLIST)
-    {
 		if(response)
 		{
-			if (PlayerChar[playerid][listitem][0] == EOS)
-				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Exit");
+			if(listitem == 0)
+			{
+				Furniture_Delete(id);
 
-			PlayerData[playerid][pChar] = listitem;
-			SetPlayerName(playerid, PlayerChar[playerid][listitem]);
+				SendServerMessage(playerid, "You have successfully removed the furniture!");
 
-			new cQuery[256];
-			mysql_format(sqlcon, cQuery, sizeof(cQuery), "SELECT * FROM `characters` WHERE `Name` = '%s' LIMIT 1;", PlayerChar[playerid][PlayerData[playerid][pChar]]);
-			mysql_tquery(sqlcon, cQuery, "LoadCharacterData", "d", playerid);
-			
+				cmd_house(playerid, "menu");
+			}
+			if(listitem == 1)
+			{
+				if(House_Inside(playerid) != -1 && House_IsOwner(playerid, House_Inside(playerid)))
+				{
+					if(Iter_Contains(Furniture, id))
+					{
+						PlayerData[playerid][pEditType] = EDIT_FURNITURE;
+
+						EditDynamicObject(playerid, FurnitureData[id][furnitureObject]);
+
+						SendServerMessage(playerid, "You are not in editing mode of furniture index id: %d", id);
+					}
+				}
+			}
+			if(listitem == 2)
+			{
+				ShowEditTextDraw(playerid);
+
+				SendServerMessage(playerid, "You are now in editing mode of furniture index id: %d", id);
+
+			}
 		}
 	}
-	if(dialogid == DIALOG_MAKECHAR)
-	{
-	    if(response)
-	    {
-		    if(strlen(inputtext) < 1 || strlen(inputtext) > 24)
-				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Back");
-
-			if(!IsRoleplayName(inputtext))
-				return ShowPlayerDialog(playerid, DIALOG_MAKECHAR, DIALOG_STYLE_INPUT, "Create Character", "Insert your new Character Name\n\nExample: Finn_Xanderz, Javier_Cooper etc.", "Create", "Back");
-
-			new characterQuery[178];
-			mysql_format(sqlcon, characterQuery, sizeof(characterQuery), "SELECT * FROM `characters` WHERE `Name` = '%s'", inputtext);
-			mysql_tquery(sqlcon, characterQuery, "InsertPlayerName", "ds", playerid, inputtext);
-
-		    format(PlayerData[playerid][pUCP], 22, GetName(playerid));
-		}
-	}
-	if(dialogid == DIALOG_AGE)
+	if(dialogid == DIALOG_FURNITURE_LIST)
 	{
 		if(response)
 		{
-			if(strval(inputtext) >= 70)
-			    return ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "ERROR: Cannot more than 70 years old!", "Continue", "Cancel");
+			if(House_Inside(playerid) != -1 && House_IsOwner(playerid, House_Inside(playerid)))
+			{
+				PlayerData[playerid][pEditing] = ListedFurniture[playerid][listitem];
 
-			if(strval(inputtext) < 13)
-			    return ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "ERROR: Cannot below 13 Years Old!", "Continue", "Cancel");
-
-			PlayerData[playerid][pAge] = strval(inputtext);
-			ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
-		}
-		else
-		{
-		    ShowPlayerDialog(playerid, DIALOG_AGE, DIALOG_STYLE_INPUT, "Character Age", "Please Insert your Character Age", "Continue", "Cancel");
+				ShowPlayerDialog(playerid, DIALOG_FURNITURE_MENU, DIALOG_STYLE_LIST, "Furniture Option(s)", "Remove furniture\nEdit position (click n drag)\nEdit position (click textdraw)", "Select", "Close");
+			}
 		}
 	}
-	if(dialogid == DIALOG_ORIGIN)
+	if(dialogid == DIALOG_FURNITURE)
 	{
-	    if(!response)
-	        return ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
-
-		if(strlen(inputtext) < 1)
-		    return ShowPlayerDialog(playerid, DIALOG_ORIGIN, DIALOG_STYLE_INPUT, "Character Origin", "Please input your Character Origin:", "Continue", "Quit");
-
-        format(PlayerData[playerid][pOrigin], 32, inputtext);
-        ShowPlayerDialog(playerid, DIALOG_GENDER, DIALOG_STYLE_LIST, "Character Gender", "Male\nFemale", "Continue", "Cancel");
-	}
-	if(dialogid == DIALOG_GENDER)
-	{
-	    if(!response)
-	        return ShowPlayerDialog(playerid, DIALOG_GENDER, DIALOG_STYLE_LIST, "Character Gender", "Male\nFemale", "Continue", "Cancel");
-
-		if(listitem == 0)
+		if(response)
 		{
-			PlayerData[playerid][pGender] = 1;
-			PlayerData[playerid][pSkin] = 240;
-			PlayerData[playerid][pHealth] = 100.0;
-			SetupPlayerData(playerid);
+			if(listitem == 0)
+			{
+			    new count = 0, string[MAX_FURNITURE * 32], houseid = House_Inside(playerid);
+			    format(string, sizeof(string), "Model Name\tModel ID\tDistance\n");
+				foreach(new i : Furniture) if (FurnitureData[i][furnitureHouse] == houseid)
+				{
+					ListedFurniture[playerid][count++] = i;
+					format(string, sizeof(string), "%s%s\t%d\t%.2f meters\n", string, FurnitureData[i][furnitureName], FurnitureData[i][furnitureModel], GetPlayerDistanceFromPoint(playerid, FurnitureData[i][furniturePos][0], FurnitureData[i][furniturePos][1], FurnitureData[i][furniturePos][2]));
+				}
+				if (count)
+				{
+					ShowPlayerDialog(playerid, DIALOG_FURNITURE_LIST, DIALOG_STYLE_TABLIST_HEADERS, "Furniture List", string, "Select", "Cancel");
+			 	}
+			 	else SendErrorMessage(playerid, "There is no furniture on this house!"), cmd_house(playerid, "menu");
+			}
+			if(listitem == 1)
+			{
+				if(Furniture_GetCount(House_Inside(playerid)) >= 30)
+					return SendErrorMessage(playerid, "You only can place 30 furniture per house!"), cmd_house(playerid, "menu");
+
+				new str[312];
+
+		        str[0] = 0;
+
+		        for (new i = 0; i < sizeof(g_aFurnitureTypes); i ++) {
+		            format(str, sizeof(str), "%s%s - $%s\n", str, g_aFurnitureTypes[i], FormatNumber(Furniture_ReturnPrice(i)));
+				}
+				ShowPlayerDialog(playerid, DIALOG_FURNITURE_BUY, DIALOG_STYLE_LIST, "Purchase Furniture", str, "Select", "Close");
+			}
+			if(listitem == 3)
+			{
+				if(Furniture_GetCount(House_Inside(playerid)) < 1)
+					return SendErrorMessage(playerid, "There is no furniture on your house!"), cmd_house(playerid, "menu");
+
+				foreach(new i : Furniture) if(FurnitureData[i][furnitureHouse] == House_Inside(playerid))
+				{
+					Furniture_Delete(i);
+				}
+				SendServerMessage(playerid, "You have removed all furniture on this house!");
+				cmd_house(playerid, "menu");
+			}
 		}
-		if(listitem == 1)
+	}
+	if(dialogid == DIALOG_HOUSE_MENU)
+	{
+		if(response)
 		{
-			PlayerData[playerid][pGender] = 2;
-			PlayerData[playerid][pSkin] = 172;
-			PlayerData[playerid][pHealth] = 100.0;
-			SetupPlayerData(playerid);
-			
+			if(listitem == 0)
+			{
+				ShowPlayerDialog(playerid, DIALOG_FURNITURE, DIALOG_STYLE_LIST, "House Furniture", "Furniture list\nPurchase furniture\nRemove all furniture", "Select", "Close");
+			}
+			if(listitem == 1)
+			{
+				House_OpenStorage(playerid, House_Inside(playerid));
+			}
 		}
 	}
 	return 1;
@@ -847,6 +1045,43 @@ public OnPlayerSpawn(playerid)
 		PlayerTextDrawShow(playerid, ENERGYTD[playerid][0]);
 		PlayerTextDrawShow(playerid, ENERGYTD[playerid][1]);
 		ENERGYBAR[playerid] = CreatePlayerProgressBar(playerid, 539.000000, 158.000000, 69.500000, 9.000000, 9109759, 100.000000, 0);
+	}
+	return 1;
+}
+
+public OnPlayerEditDynamicObject(playerid, STREAMER_TAG_OBJECT:objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
+{
+	new id = PlayerData[playerid][pEditing];
+	if(response == EDIT_RESPONSE_FINAL)
+	{
+		if(PlayerData[playerid][pEditing] != -1)
+		{
+			if(PlayerData[playerid][pEditType] == EDIT_FURNITURE)
+			{
+				FurnitureData[id][furniturePos][0] = x;
+				FurnitureData[id][furniturePos][1] = y;
+				FurnitureData[id][furniturePos][2] = z;
+
+				FurnitureData[id][furnitureRot][0] = rx;
+				FurnitureData[id][furnitureRot][1] = ry;
+				FurnitureData[id][furnitureRot][2] = rz;
+
+				Furniture_Save(id);
+				Furniture_Refresh(id);
+
+				SendServerMessage(playerid, "You have successfully editing furniture ID: %d", id);
+			}
+		}
+		PlayerData[playerid][pEditing] = -1;
+		PlayerData[playerid][pEditType] = EDIT_NONE;
+	}
+	if(response == EDIT_RESPONSE_CANCEL)
+	{
+		if(PlayerData[playerid][pEditType] == EDIT_FURNITURE)
+			Furniture_Refresh(id);
+
+		PlayerData[playerid][pEditType] = EDIT_NONE;
+
 	}
 	return 1;
 }

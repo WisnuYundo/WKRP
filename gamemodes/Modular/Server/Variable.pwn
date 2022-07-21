@@ -6,16 +6,6 @@ new g_RaceCheck[MAX_PLAYERS char];
 new PlayerChar[MAX_PLAYERS][MAX_CHARS][MAX_PLAYER_NAME + 1];
 new tempUCP[64];
 
-new PlayerText:ENERGYTD[MAX_PLAYERS][2];
-new PlayerBar:ENERGYBAR[MAX_PLAYERS];
-
-new PlayerText:SPEEDOTD[MAX_PLAYERS][4];
-new PlayerBar:FUELBAR[MAX_PLAYERS];
-new PlayerText:HEALTHTD[MAX_PLAYERS];
-new PlayerText:KMHTD[MAX_PLAYERS];
-new PlayerText:VEHNAMETD[MAX_PLAYERS];
-new PlayerText:MSGTD[MAX_PLAYERS];
-
 new g_aMaleSkins[] = {
 	1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
 	30, 32, 33, 34, 35, 36, 37, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 57, 58, 59, 60,
@@ -53,6 +43,8 @@ enum
 	DIALOG_HELP,
 	DIALOG_HELP_RETURN,
 	DIALOG_HELP_JOB,
+	DIALOG_STREAMER_CONFIG,
+
 
 	DIALOG_NONE,
 	DIALOG_BIZBUY,
@@ -78,7 +70,12 @@ enum
 	DIALOG_BIZCARGO,
 	//House
 	DIALOG_HOUSE_MENU,
-	DIALOG_HOUSE_PARK
+	DIALOG_HOUSE_PARK,
+	DIALOG_HOUSESTORAGE,
+	DIALOG_FURNITURE,
+	DIALOG_FURNITURE_BUY,
+	DIALOG_FURNITURE_MENU,
+	DIALOG_FURNITURE_LIST
 };
 
 enum e_player_data
@@ -105,6 +102,8 @@ enum e_player_data
 	pBank,
 	pInBiz,
 	pListitem,
+	pEditing,
+	pEditType,
 	pStorageSelect,
 	pAdmin,
 	pAduty,
@@ -121,3 +120,13 @@ enum e_player_data
 
 new PlayerData[MAX_PLAYERS][e_player_data];
 
+enum
+{
+	MODEL_SELECTION_FURNITURE,
+}
+
+enum
+{
+	EDIT_FURNITURE,
+	EDIT_NONE,
+}
