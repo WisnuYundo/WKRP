@@ -10,5 +10,4 @@
 [x] Dynamic player inventory system
 [x] Dynamic House system 
 [x] Funiture System
-[x] Parking House system with slot vehicle (unfinished yed)
-
+[x] Parking House system with slot vehicle
