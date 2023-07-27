@@ -11,4 +11,4 @@
 [x] Dynamic House system 
 [x] Funiture System
 [x] Parking House system with slot vehicle
-GAMEMODE update setiap minggu 🌞
+-GAMEMODE update setiap minggu 🌞
